@@ -1,6 +1,6 @@
 CREATE DATABASE encuestas;
 
-\c encuestas;
+\connect encuestas;
 
 CREATE TABLE Roles (
   id SERIAL PRIMARY KEY,                -- 1: administrador, 2: creador encuestas, 3: encuestado

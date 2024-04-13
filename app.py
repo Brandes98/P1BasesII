@@ -31,8 +31,15 @@ appService = AppService(db)
 def home():
     return "App Works!!!"
 
-@app.route("/paises", methods=["GET"])
-def get_paises():
-    return appService.get_paises()
+# Autenticación y Autorización
+@app.route("/auth/register", methods=["POST"])
+def insert_user():
+    user_data = request.get_json()
+    appService.insert_user(user_data)
+    return user_data
 
-
+# Usuarios
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = appService.get_users()
+    return jsonify(users)

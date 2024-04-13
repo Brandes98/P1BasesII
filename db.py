@@ -17,12 +17,20 @@ class Database:
         self.encuestas = self.db["encuestas"]
         self.respuestas = self.db["respuestas"]
 
-    def get_paises(self):
+    # Métodos
+    # Autenticación y Autorización
+    def insert_user(self, user_data):
         cursor = self.conn.cursor()
         cursor.execute(
-            f"SELECT * FROM Paises;"
-        )
+            f"CALL INSERTAR_USUARIO('{user_data['Nombre']}', '{user_data['idRol']}', '{user_data['Correo']}', '{user_data['Contrasenna']}', '{user_data['FechaCreacion']}', '{user_data['FechaNacimiento']}', '{user_data['Genero']}', '{user_data['idPais']}');"
+        )   
         self.conn.commit()
-        data = cursor.fetchall()
         cursor.close()
-        return data
+
+    # Usuarios
+    def get_users(self):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM OBTENER_USUARIOS();")
+        users = cursor.fetchall()
+        cursor.close()
+        return users
