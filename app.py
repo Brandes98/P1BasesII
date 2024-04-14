@@ -38,6 +38,12 @@ def insert_user():
     appService.insert_user(user_data)
     return user_data
 
+@app.route("/auth/login", methods=["POST"])
+def login_user():
+    user_data = request.get_json()
+    token = appService.login_user(user_data)
+    return token
+
 # Usuarios
 @app.route("/users", methods=["GET"])
 def get_users():

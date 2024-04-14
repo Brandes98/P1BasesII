@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import psycopg2
 from bson import ObjectId
+from datetime import datetime
 
 class Database:
     def __init__(
@@ -27,10 +28,23 @@ class Database:
         self.conn.commit()
         cursor.close()
 
+    def login_user(self, user_data):
+        cursor = self.conn.cursor()
+        token = None
+        fecha = datetime.now()
+        cursor.execute(
+            "CALL LOGIN_USUARIO(%s, %s, %s, %s);",
+            (user_data['Correo'], user_data['Contrasenna'], fecha, token)
+        )
+        # Obtener el valor de salida actualizado
+        token = cursor.fetchone()[0]
+        cursor.close()
+        return token   
+
     # Usuarios
     def get_users(self):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM OBTENER_USUARIOS();")
+        cursor.execute("SELECT (U.id, U.Nombre, R.Nombre, U.Correo, U.FechaCreacion, U.FechaNacimiento, OBTENER_GENERO(U.Genero), P.Nombre) FROM Usuarios AS U INNER JOIN Roles AS R ON U.idRol = R.id INNER JOIN Paises AS P ON U.idPais = P.id;")
         users = cursor.fetchall()
         cursor.close()
         return users
