@@ -2,130 +2,9 @@ from pymongo import MongoClient
 from flask import request, jsonify
 from bson import ObjectId
 from datetime import datetime
+from json_schemas import survey_schema, answer_schema
 import psycopg2
 import json
-
-survey_schema = {
-    "$jsonSchema": {
-        "bsonType": "object",
-        "required": ["NumeroEncuesta", "Titulo", "IdAutor", "Autor", "FechaCreacion", "FechaActualizacion", "Disponible", "Preguntas"],
-        "properties": {
-            "NumeroEncuesta": {
-                "bsonType": "int",
-                "description": "must be an integer and is required"
-            },
-            "Titulo": {
-                "bsonType": "string",
-                "description": "must be a string and is required"
-            },
-            "IdAutor": {
-                "bsonType": "int",
-                "description": "must be an integer and is required"
-            },
-            "Autor": {
-                "bsonType": "string",
-                "description": "must be a string and is required"
-            },
-            "FechaCreacion": {
-                "bsonType": "date",
-                "description": "must be a datetime object and is required"
-            },
-            "FechaActualizacion": {
-                "bsonType": "date",
-                "description": "must be a datetime object and is required"
-            },
-            "Disponible": {
-                "bsonType": "int",
-                "description": "must be an integer and is required"
-            },
-            "Preguntas": {
-                "bsonType": "array",
-                "items": {
-                    "bsonType": "object",
-                    "required": ["Numero", "Categoria", "Pregunta"],
-                    "properties": {
-                        "Numero": {
-                            "bsonType": "int",
-                            "description": "must be an integer and is required"
-                        },
-                        "Categoria": {
-                            "bsonType": "string",
-                            "description": "must be a string and is required"
-                        },
-                        "Pregunta": {
-                            "bsonType": "string",
-                            "description": "must be a string and is required"
-                        },
-                        "Opciones": {
-                            "bsonType": "array",
-                            "items": {
-                                "bsonType": ["string", "int"],
-                                "description": "must be an array of strings or integers"
-                            },
-                            "description": "optional field, required for certain categories"
-                        }
-                    }
-                },
-                "description": "must be an array of questions and is required"
-            }
-        }
-    }
-}
-
-answer_schema = {
-    "$jsonSchema": {
-        "bsonType": "object",
-        "required": ["NumeroEncuesta", "IdEncuestado", "Nombre", "Correo", "FechaRealizado", "Preguntas"],
-        "properties": {
-            "NumeroEncuesta": {
-                "bsonType": "int",
-                "description": "must be an integer and is required"
-            },
-            "IdEncuestado": {
-                "bsonType": "int",
-                "description": "must be an integer and is required"
-            },
-            "Nombre": {
-                "bsonType": "string",
-                "description": "must be a string and is required"
-            },
-            "Correo": {
-                "bsonType": "string",
-                "description": "must be a string and is required"
-            },
-            "FechaRealizado": {
-                "bsonType": "date",
-                "description": "must be a datetime object and is required"
-            },
-            "Preguntas": {
-                "bsonType": "array",
-                "items": {
-                    "bsonType": "object",
-                    "required": ["Numero", "Categoria", "Pregunta", "Respuesta"],
-                    "properties": {
-                        "Numero": {
-                            "bsonType": "int",
-                            "description": "must be an integer and is required"
-                        },
-                        "Categoria": {
-                            "bsonType": "string",
-                            "description": "must be a string and is required"
-                        },
-                        "Pregunta": {
-                            "bsonType": "string",
-                            "description": "must be a string and is required"
-                        },
-                        "Respuesta": {
-                            "bsonType": ["string", "array", "int"],
-                            "description": "must be a string, an array, or an integer, depending on the question type"
-                        }
-                    }
-                },
-                "description": "must be an array of answers and is required"
-            }
-        }
-    }
-}
 
 class Database:
     def __init__(
@@ -139,8 +18,11 @@ class Database:
         # MongoDB
         self.client = MongoClient(uri)
         self.db = self.client[database]
+
         self.encuestas = self.create_or_update_collection("encuestas", survey_schema)
+        self.encuestas.create_index([("NumeroEncuesta", 1)], unique=True)
         self.respuestas = self.create_or_update_collection("respuestas", answer_schema)
+
         self.insert_surveys_mongodb()
         self.insert_answers_mongodb()
 
@@ -155,8 +37,8 @@ class Database:
     # Métodos
     # Insertar datos MongoDB
     def insert_surveys_mongodb(self):
-        for i in range(5):
-            with open ('data_surveys.jsonl', 'r') as file:
+        if self.encuestas.count_documents({}) == 0:
+            with open('data_surveys.jsonl', 'r') as file:
                 for line in file:
                     data = json.loads(line)
                     data['FechaCreacion'] = datetime.fromisoformat(data['FechaCreacion'])
@@ -164,12 +46,53 @@ class Database:
                     self.encuestas.insert_one(data)
 
     def insert_answers_mongodb(self):
-        for i in range(15):
-            with open ('data_answers.jsonl', 'r') as file:
+        if self.respuestas.count_documents({}) == 0:
+            with open('data_answers.jsonl', 'r') as file:
                 for line in file:
                     data = json.loads(line)
                     data['FechaRealizado'] = datetime.fromisoformat(data['FechaRealizado'])
                     self.respuestas.insert_one(data)
+
+    # Verificar data
+    def verify_author(self, idAutor):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id FROM Usuarios WHERE id = %s;", (idAutor,))
+        user = cursor.fetchone()
+        cursor.close()
+        return True if user else False
+
+    # Verificar token
+    def get_token(self, token):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT U.idRol FROM Logs AS L INNER JOIN Usuarios AS U ON L.IdUsuario = U.id WHERE L.Token = %s;", (token,))
+        user = cursor.fetchone()
+        cursor.close()
+        return user[0] if user else 0
+    
+    def verify_token_admin(self, token):
+        return self.get_token(token) == 1
+
+    def verify_token_create_surveys(self, token):
+        return self.get_token(token) in [1, 2]
+    
+    def verify_token_user(self, idAutor, token):
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT U.id, U.idRol FROM Logs AS L INNER JOIN Usuarios AS U ON L.IdUsuario = U.id WHERE L.Token = %s AND U.id = %s AND L.FechaLogOut IS NULL;", (token, idAutor))
+        user = cursor.fetchone()
+        cursor.close()
+        return user if user else None
+
+    def verify_token_creator_survey(self, idAutor, num_encuesta, token):
+        user = self.verify_token_user(idAutor, token)
+        author = self.verify_author(idAutor)
+        if not user or not author:
+            return False 
+        if user[1] == 1:
+            return True
+        elif user[1] == 2:
+            survey = self.encuestas.find_one({"NumeroEncuesta": num_encuesta, "IdAutor": idAutor})
+            return survey["IdAutor"] == user[0]
+        return False
 
     # Autenticación y Autorización
     def insert_user(self, user_data):
@@ -204,17 +127,23 @@ class Database:
     # Encuestas
     def insert_survey(self, data):
         try:
-            token = data.pop('token', None)  # Optionally remove a token key
-            data['FechaCreacion'] = datetime.fromisoformat(data['FechaCreacion'])
-            data['FechaActualizacion'] = datetime.fromisoformat(data['FechaActualizacion'])
-            result = self.encuestas.insert_one(data)
-            return result.inserted_id  # Return the ID of the inserted document
+            token = data.pop("Token", 0)
+            if token == 0:
+                raise ValueError("Token is required")
+            
+            if self.verify_token_create_surveys(token):
+                data['FechaCreacion'] = datetime.fromisoformat(data['FechaCreacion'])
+                data['FechaActualizacion'] = datetime.fromisoformat(data['FechaActualizacion'])
+                insert_result = self.encuestas.insert_one(data)
+                return insert_result
+            else:
+                raise Exception("You don't have permission to create this survey.")
         except Exception as e:
             raise Exception(f"An error occurred during survey insertion: {str(e)}")
 
-    def get_surveys(self, page=1, limit=10):
+    def get_public_surveys(self, page=1, limit=10):
         offset = (page - 1) * limit
-        surveys = self.encuestas.find().skip(offset).limit(limit)
+        surveys = self.encuestas.find({"Disponible": 1}).skip(offset).limit(limit)
         result = []
         for survey in surveys:
             survey['_id'] = str(survey['_id'])
@@ -224,16 +153,35 @@ class Database:
     
     def get_specific_survey(self, id):
         survey = self.encuestas.find_one({"NumeroEncuesta": id})
-        survey['_id'] = str(survey['_id'])
+        if survey:
+            survey['_id'] = str(survey['_id'])
+        else:
+            survey = None
         return survey
     
     def update_survey(self, id, data):
-        token = data.pop('token', None)
-        self.encuestas.update_one({"NumeroEncuesta": id}, {"$set": data})
-        return data
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token):
+            data['FechaCreacion'] = datetime.fromisoformat(data['FechaCreacion'])
+            data['FechaActualizacion'] = datetime.fromisoformat(data['FechaActualizacion'])
+            self.encuestas.update_one({"NumeroEncuesta": id}, {"$set": data})
+            return data
+        return None
     
-    def delete_survey(self, id, token):
-        self.encuestas.delete_one({"NumeroEncuesta": id})
+    def delete_survey(self, id, data):
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token):
+            self.encuestas.delete_one({"NumeroEncuesta": id})
+            return True
+        return False
 
-    def publish_survey(self, id, token):
-        self.encuestas.update_one({"NumeroEncuesta": id}, {"$set": {"Disponible": 1}})
+
+    def publish_survey(self, id, data):
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token):
+            self.encuestas.update_one({"NumeroEncuesta": id}, {"$set": {"Disponible": 1}})
+            return True
+        return False

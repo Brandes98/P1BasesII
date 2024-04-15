@@ -36,9 +36,33 @@ def datetime_converter(o):
     if isinstance(o, datetime):
         return o.__str__()
 
+# Cache
+def get_cache(cache_key):
+    cached_surveys = redis_client.get(cache_key)
+    if cached_surveys:
+        return jsonify(json.loads(cached_surveys)) 
+    return None
+
+# Cache cleaner
+def cache_cleaner_surveys():
+    for key in redis_client.scan_iter("surveys:*"):
+        redis_client.delete(key)
+
+def cache_cleaner_survey(id):
+    redis_client.delete(f"survey:{id}")
+
+def cache_cleaner_all_surveys(id):
+    cache_cleaner_survey(id)
+    cache_cleaner_surveys()
+
 @app.route("/")
 def home():
     return "App Works!!!"
+
+@app.route("/test", methods=["GET"])
+def test():
+    data = request.get_json()
+    return jsonify(appService.test(data))
 
 # Autenticación y Autorización
 @app.route("/auth/register", methods=["POST"])
@@ -63,30 +87,30 @@ def get_users():
 @app.route("/surveys", methods=["POST"])
 def insert_survey():
     try:
-        data = request.get_json()
-        inserted_id = appService.insert_survey(data)
-        data['_id'] = str(inserted_id) 
-        return jsonify(data), 201
+        data_with_token = request.get_json()
+        result = appService.insert_survey(data_with_token)
+        if result.inserted_id:
+            data_with_token['_id'] = str(result.inserted_id)
+            return jsonify(data_with_token), 201
+        else:
+            return jsonify({"error": "Failed to insert survey"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route("/surveys/page=<int:num_page>", methods=["GET"])
-def get_surveys(num_page):
+def get_public_surveys(num_page):
     page = int(request.args.get('page', num_page))
     limit = int(request.args.get('limit', 10))
+
     cache_key = f"surveys:{page}:{limit}"
-
-    # Try to fetch the result from cache
-    cached_surveys = redis_client.get(cache_key)
+    cached_surveys = get_cache(cache_key)
     if cached_surveys:
-        return jsonify(json.loads(cached_surveys))  # Load JSON string from cache and convert to JSON
-
-    # If not cached, fetch from the database
+        return cached_surveys
+    
     try:
-        surveys = appService.get_surveys(page, limit)
-        # Serialize with custom datetime handler
+        surveys = appService.get_public_surveys(page, limit)
         serialized_data = json.dumps(surveys, default=datetime_converter)
-        redis_client.setex(cache_key, 3600, serialized_data)  # Cache for 1 hour
+        redis_client.setex(cache_key, 3600, serialized_data)
         return jsonify(surveys)
     except ValueError:
         return jsonify({"error": "Invalid page or limit value"}), 400
@@ -96,23 +120,54 @@ def get_surveys(num_page):
 
 @app.route("/surveys/<int:id>", methods=["GET"])
 def get_specific_survey(id):
-    survey = appService.get_specific_survey(id)
-    return survey
+    cache_key = f"survey:{id}"
+    cached_surveys = get_cache(cache_key)
+    if cached_surveys:
+        return cached_surveys
+
+    try:
+        survey = appService.get_specific_survey(id)
+        if survey:
+            serialized_data = json.dumps(survey, default=datetime_converter)
+            redis_client.setex(cache_key, 3600, serialized_data)
+            return jsonify(survey)
+        else:
+            return jsonify({"error": "Survey not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/surveys/<int:id>", methods=["PUT"])
 def update_survey(id):
     data = request.get_json()
-    appService.update_survey(id, data)
-    return data
+    try:
+        data = appService.update_survey(id, data)
+        if data is None:
+            return jsonify({"error": "Survey not found"}), 404
+        cache_cleaner_all_surveys(id)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/surveys/<int:id>", methods=["DELETE"])
 def delete_survey(id):
-    token = request.get_json()
-    appService.delete_survey(id, token)
-    return "Encuesta eliminada"
+    try:
+        data = request.get_json() 
+        flag = appService.delete_survey(id, data)
+        if flag:
+            cache_cleaner_all_surveys(id)
+            return "Encuesta eliminada", 200
+        return jsonify({"error": "Survey not found or no permission to delete"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/surveys/<int:id>/publish", methods=["POST"])
 def publish_survey(id):
-    token = request.get_json()
-    appService.publish_survey(id)
-    return "Encuesta publicada"
+    try:
+        data = request.get_json()
+        flag = appService.publish_survey(id, data)
+        if flag:
+            cache_cleaner_all_surveys(id)
+            return "Encuesta publicada", 200
+        return jsonify({"error": "Survey not found or no permission to publish"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
