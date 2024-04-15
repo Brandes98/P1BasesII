@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import psycopg2
 from bson import ObjectId
 from datetime import datetime
+import json
 
 class Database:
     def __init__(
@@ -17,8 +18,28 @@ class Database:
         self.db = self.client[database]
         self.encuestas = self.db["encuestas"]
         self.respuestas = self.db["respuestas"]
+        #self.insert_surveys_mongodb()
+        #self.insert_answers_mongodb()
 
     # Métodos
+    # Insertar datos MongoDB
+    def insert_surveys_mongodb(self):
+        for i in range(5):
+            with open ('data_surveys.jsonl', 'r') as file:
+                for line in file:
+                    data = json.loads(line)
+                    data['FechaCreacion'] = datetime.fromisoformat(data['FechaCreacion'])
+                    data['FechaActualizacion'] = datetime.fromisoformat(data['FechaActualizacion'])
+                    self.encuestas.insert_one(data)
+
+    def insert_answers_mongodb(self):
+        for i in range(15):
+            with open ('data_answers.jsonl', 'r') as file:
+                for line in file:
+                    data = json.loads(line)
+                    data['FechaRealizado'] = datetime.fromisoformat(data['FechaRealizado'])
+                    self.respuestas.insert_one(data)
+
     # Autenticación y Autorización
     def insert_user(self, user_data):
         cursor = self.conn.cursor()
