@@ -1,0 +1,594 @@
+{
+	"info": {
+		"_postman_id": "14fbff22-37f2-4cf4-a97b-29a7e47e8b0e",
+		"name": "BDII-Proyecto1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33176326"
+	},
+	"item": [
+		{
+			"name": "Encuestas",
+			"item": [
+				{
+					"name": "/surveys",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n  \"NumeroEncuesta\": 43,\r\n  \"Titulo\": \"Decade design street bad computer should director those.\",\r\n  \"IdAutor\": 2,\r\n  \"Autor\": \"EncuestasMX\",\r\n  \"FechaCreacion\": \"1976-01-02T10:29:34\",\r\n  \"FechaActualizacion\": \"2007-11-01T03:45:47\",\r\n  \"Disponible\": 1,\r\n  \"Preguntas\": [\r\n    {\r\n      \"Numero\": 1,\r\n      \"Categoria\": \"EleccionMultiples\",\r\n      \"Pregunta\": \"Just wall you speech other.\",\r\n      \"Opciones\": [\r\n        \"main\",\r\n        \"star\",\r\n        \"he\",\r\n        \"administration\",\r\n        \"carry\",\r\n        \"source\"\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 2,\r\n      \"Categoria\": \"EscalaCalificacion\",\r\n      \"Pregunta\": \"Live example buy garden.\",\r\n      \"Opciones\": [\r\n        4,\r\n        10\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 3,\r\n      \"Categoria\": \"SiNo\",\r\n      \"Pregunta\": \"Ten personal authority single.\"\r\n    },\r\n    {\r\n      \"Numero\": 4,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Lay between cover my along certain television.\"\r\n    },\r\n    {\r\n      \"Numero\": 5,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Sense room get outside.\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys (error) (no idAutor)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n  \"NumeroEncuesta\": 43,\r\n  \"Titulo\": \"Decade design street bad computer should director those.\",\r\n  \"Autor\": \"EncuestasMX\",\r\n  \"FechaCreacion\": \"1976-01-02T10:29:34\",\r\n  \"FechaActualizacion\": \"2007-11-01T03:45:47\",\r\n  \"Disponible\": 1,\r\n  \"Preguntas\": [\r\n    {\r\n      \"Numero\": 1,\r\n      \"Categoria\": \"EleccionMultiples\",\r\n      \"Pregunta\": \"Just wall you speech other.\",\r\n      \"Opciones\": [\r\n        \"main\",\r\n        \"star\",\r\n        \"he\",\r\n        \"administration\",\r\n        \"carry\",\r\n        \"source\"\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 2,\r\n      \"Categoria\": \"EscalaCalificacion\",\r\n      \"Pregunta\": \"Live example buy garden.\",\r\n      \"Opciones\": [\r\n        4,\r\n        10\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 3,\r\n      \"Categoria\": \"SiNo\",\r\n      \"Pregunta\": \"Ten personal authority single.\"\r\n    },\r\n    {\r\n      \"Numero\": 4,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Lay between cover my along certain television.\"\r\n    },\r\n    {\r\n      \"Numero\": 5,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Sense room get outside.\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/page=1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/surveys/page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"page=1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/page=2 (error) (no tantos datos)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/surveys/page=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"page=2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/surveys/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/100 (error) (no num_encuesta100)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/surveys/100",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"100"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/43",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n  \"NumeroEncuesta\": 43,\r\n  \"Titulo\": \"Nuevo título\",\r\n  \"IdAutor\": 2,\r\n  \"Autor\": \"EncuestasMX\",\r\n  \"FechaCreacion\": \"1976-01-02T10:29:34\",\r\n  \"FechaActualizacion\": \"2007-11-01T03:45:47\",\r\n  \"Disponible\": 1,\r\n  \"Preguntas\": [\r\n    {\r\n      \"Numero\": 1,\r\n      \"Categoria\": \"EleccionMultiples\",\r\n      \"Pregunta\": \"Just wall you speech other.\",\r\n      \"Opciones\": [\r\n        \"main\",\r\n        \"star\",\r\n        \"he\",\r\n        \"administration\",\r\n        \"carry\",\r\n        \"source\"\r\n      ]\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/43",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"43"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/100 (error) (no num_encuestas)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n  \"NumeroEncuesta\": 77,\r\n  \"Titulo\": \"Nuevo título\",\r\n  \"IdAutor\": 2,\r\n  \"Autor\": \"EncuestasMX\",\r\n  \"FechaCreacion\": \"1976-01-02T10:29:34\",\r\n  \"FechaActualizacion\": \"2007-11-01T03:45:47\",\r\n  \"Disponible\": 1,\r\n  \"Preguntas\": [\r\n    {\r\n      \"Numero\": 1,\r\n      \"Categoria\": \"EleccionMultiples\",\r\n      \"Pregunta\": \"Just wall you speech other.\",\r\n      \"Opciones\": [\r\n        \"main\",\r\n        \"star\",\r\n        \"he\",\r\n        \"administration\",\r\n        \"carry\",\r\n        \"source\"\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 2,\r\n      \"Categoria\": \"EscalaCalificacion\",\r\n      \"Pregunta\": \"Live example buy garden.\",\r\n      \"Opciones\": [\r\n        4,\r\n        10\r\n      ]\r\n    },\r\n    {\r\n      \"Numero\": 3,\r\n      \"Categoria\": \"SiNo\",\r\n      \"Pregunta\": \"Ten personal authority single.\"\r\n    },\r\n    {\r\n      \"Numero\": 4,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Lay between cover my along certain television.\"\r\n    },\r\n    {\r\n      \"Numero\": 5,\r\n      \"Categoria\": \"Numericas\",\r\n      \"Pregunta\": \"Sense room get outside.\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/77",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"77"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/4 (error) (no permisos)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 3,\r\n    \"IdAutor\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/5/publish",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/5/publish",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"5",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/5/publish (error) (no permisos)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 3,\r\n    \"IdAutor\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/5/publish",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"5",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Preguntas de Encuestas",
+			"item": [
+				{
+					"name": "/surveys/1/questions",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1,\r\n    \"Preguntas\": [ \r\n                   {\"Numero\": 6, \r\n                   \"Categoria\": \"EleccionSimples\", \r\n                   \"Pregunta\": \"Else scene sure region study or.\", \r\n                   \"Opciones\": [\"laugh\", \"always\", \"than\", \"environment\", \"wear\"]}\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions (error) (falta información pregunta)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1,\r\n    \"Preguntas\": [ \r\n                    {\r\n                        \"Numero\": 0,\r\n                        \"Categoria\": \"SiNo\"\r\n                    }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/100/questions (error) (num_encuesta incorrecto)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5002/surveys/100/questions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"100",
+								"questions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions/1",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1,\r\n    \"Preguntas\": [ \r\n                   {\"Numero\": 1, \r\n                   \"Categoria\": \"EleccionSimples\", \r\n                   \"Pregunta\": \"¿10's GOAT?\", \r\n                   \"Opciones\": [\"Lebron\", \"Curry\", \"Durant\", \"Harden\"]}\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions/1 (error) (no permisos)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n    \"IdAutor\": 2,\r\n    \"Preguntas\": [ \r\n                   {\"Numero\": 1, \r\n                   \"Categoria\": \"EleccionSimples\", \r\n                   \"Pregunta\": \"¿10's GOAT?\", \r\n                   \"Opciones\": [\"Messi\", \"Ronaldo\"]\r\n                   }]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions/5",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 1,\r\n    \"IdAutor\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/surveys/1/questions/5 (error) (no permiso)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Token\": 2,\r\n    \"IdAutor\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5002/surveys/1/questions/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5002",
+							"path": [
+								"surveys",
+								"1",
+								"questions",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

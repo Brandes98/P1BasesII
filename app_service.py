@@ -52,3 +52,16 @@ class AppService:
 
     def publish_survey(self, id, data):
         return self.database.publish_survey(id, data)
+    
+    # Preguntas de encuestas
+    def insert_question(self, id, data):
+        return self.database.insert_question(id, data)
+    
+    def get_questions(self, id):
+        return self.database.get_questions(id)
+    
+    def update_question(self, id, questionId, data):
+        return self.database.update_question(id, questionId, data)
+    
+    def delete_question(self, id, questionId, data):
+        return self.database.delete_question(id, questionId, data)

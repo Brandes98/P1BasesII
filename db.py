@@ -185,3 +185,79 @@ class Database:
             self.encuestas.update_one({"NumeroEncuesta": id}, {"$set": {"Disponible": 1}})
             return True
         return False
+    
+    # Preguntas de encuestas
+    def insert_question(self, id, data):
+        """
+        JSON EXAMPLE:
+        {
+            "IdAutor": 1,
+            "Token": "1",
+            "Preguntas": {
+                "Numero": 0,
+                "Categoria": "SiNo",
+                "Pregunta": "¿Tiene hambre?"
+            }
+        }
+        """
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token):
+            survey_questions = self.encuestas.find_one({"NumeroEncuesta": id}, {"Preguntas": 1})
+            max_number = self.encuestas.aggregate([
+                {'$match': {'NumeroEncuesta': id}},
+                {'$unwind': '$Preguntas'},
+                {'$group': {
+                    '_id': '$_id',
+                    'maxNumero': {'$max': '$Preguntas.Numero'}
+                }},
+                {'$project': { 
+                    '_id': 0,  
+                    'maxNumero': 1 
+                }}
+            ])
+            max_number = list(max_number)[0]['maxNumero'] if max_number else 0
+            for question in data['Preguntas']:
+                max_number += 1
+                question['Numero'] = max_number
+                survey_questions['Preguntas'].append(question)
+            self.encuestas.update_one(
+                                                {"NumeroEncuesta": id},
+                                                {"$set": {"Preguntas": survey_questions['Preguntas']}}
+                                            )
+            return True
+        return False
+
+    def get_questions(self, id):
+        survey_questions = self.encuestas.find_one({"NumeroEncuesta": id}, {"_id": 0, "Preguntas": 1})
+        return survey_questions if survey_questions else None
+    
+    def update_question(self, id, questionId, data):
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token) and len(data["Preguntas"]) == 1:
+            survey = self.encuestas.find_one({"NumeroEncuesta": id}, {"_id": 0, "Preguntas": 1})
+            for question in survey['Preguntas']:
+                if question['Numero'] == questionId:
+                    question.update(data['Preguntas'][0])
+                    self.encuestas.update_one(
+                        {"NumeroEncuesta": id, "Preguntas.Numero": questionId},
+                        {"$set": {"Preguntas.$": data['Preguntas'][0]}}
+                    )
+                    return data['Preguntas'][0]
+        return None
+    
+    def delete_question(self, id, questionId, data):
+        token = data.pop('Token', None)
+        idAutor = data.get('IdAutor')
+        if self.verify_token_creator_survey(idAutor, id, token):
+            survey = self.encuestas.find_one({"NumeroEncuesta": id}, {"_id": 0, "Preguntas": 1})
+            for question in survey['Preguntas']:
+                if question['Numero'] == questionId:
+                    survey['Preguntas'].remove(question)
+                    self.encuestas.update_one(
+                        {"NumeroEncuesta": id},
+                        {"$set": {"Preguntas": survey['Preguntas']}}
+                    )
+                    return survey['Preguntas']
+        return None

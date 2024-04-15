@@ -55,6 +55,9 @@ def cache_cleaner_all_surveys(id):
     cache_cleaner_survey(id)
     cache_cleaner_surveys()
 
+def cache_cleaner_questions(id):
+    redis_client.delete(f"survey_questions:{id}")
+
 @app.route("/")
 def home():
     return "App Works!!!"
@@ -169,5 +172,64 @@ def publish_survey(id):
             cache_cleaner_all_surveys(id)
             return "Encuesta publicada", 200
         return jsonify({"error": "Survey not found or no permission to publish"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# Preguntas de Encuestas
+@app.route("/surveys/<int:id>/questions", methods=["POST"])
+def insert_question(id):
+    try:
+        data = request.get_json()
+        result = appService.insert_question(id, data)
+        if result:
+            cache_cleaner_all_surveys(id)
+            cache_cleaner_questions(id)
+            return jsonify(data), 201
+        else:
+            return jsonify({"error": "Failed to insert question"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/surveys/<int:id>/questions", methods=["GET"])
+def get_questions(id):
+    key = f"survey_questions:{id}"
+    cached_questions = get_cache(key)
+    if cached_questions:
+        return cached_questions
+
+    try:
+        survey = appService.get_questions(id)
+        if survey:
+            redis_client.setex(key, 3600, json.dumps(survey))
+            return jsonify(survey.get("Preguntas", []))
+        return jsonify({"error": "Survey not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/surveys/<int:id>/questions/<int:questionId>", methods=["PUT"])
+def update_question(id, questionId):
+    data = request.get_json()
+    try:
+        data_db = appService.update_question(id, questionId, data)
+        if data_db is None:
+            return jsonify({"error": "Question not found or no permission to update"}), 404
+        if '_id' in data_db:
+            data_db['_id'] = str(data_db['_id'])
+        cache_cleaner_all_surveys(id)
+        cache_cleaner_questions(id)
+        return data_db
+    except Exception as e:
+        return jsonify({"error": str(e)}), 
+
+@app.route("/surveys/<int:id>/questions/<int:questionId>", methods=["DELETE"])
+def delete_question(id, questionId):
+    try:
+        data = request.get_json()
+        data_db = appService.delete_question(id, questionId, data)
+        if data_db:
+            cache_cleaner_all_surveys(id)
+            cache_cleaner_questions(id)
+            return "Pregunta eliminada\n" + str(data_db), 200
+        return jsonify({"error": "Question not found or no permission to delete"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
