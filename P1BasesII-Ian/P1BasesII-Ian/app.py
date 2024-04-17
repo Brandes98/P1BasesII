@@ -265,6 +265,7 @@ def post_encuestado():
             return jsonify({"error": "Failed to insert response"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 @app.route("/respondents", methods=["GET"])
 def get_encuestados():
     try:

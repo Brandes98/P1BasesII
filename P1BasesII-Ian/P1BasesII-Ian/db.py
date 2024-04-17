@@ -284,11 +284,13 @@ class Database:
         return result
     # sin probar
     def post_encuestado(self, data):
-        token = data.pop('Token', None)
-        if self.verify_token_active(token):
-            self.respuestas.insert_one(data)
-            return data
-        return None
+        cursor = self.conn.cursor()
+        data['FechaNacimiento'] = datetime.fromisoformat(data['FechaNacimiento'])
+        cursor.execute("INSERT INTO Usuarios (Nombre, idRol, Correo, Contrasenna, FechaCreacion, FechaNacimiento, Genero, idPais) VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s) RETURNING id;", (data['Nombre'], 3, data['Correo'], data['Contrasenna'], data['FechaNacimiento'], data['Genero'], data['idPais']))
+        user = cursor.fetchone()
+        cursor.close()
+        return True if user else False
+
     def get_encuestados(self): # requiere token
         respondents = self.respuestas.find()
         result = []
