@@ -28,10 +28,6 @@ app = Flask(__name__)
 mongodb_client = MongoClient(mongo_uri)
 appService = AppService(db)
 
-def invalidate_cache():
-    for key in redis_client.scan_iter("surveys:*"):
-        redis_client.delete(key)
-
 def datetime_converter(o):
     if isinstance(o, datetime):
         return o.__str__()
@@ -103,7 +99,7 @@ def insert_survey():
 @app.route("/surveys/page=<int:num_page>", methods=["GET"])
 def get_public_surveys(num_page):
     page = int(request.args.get('page', num_page))
-    limit = int(request.args.get('limit', 10))
+    limit = int(request.args.get('limit', 5))
 
     cache_key = f"surveys:{page}:{limit}"
     cached_surveys = get_cache(cache_key)
@@ -233,3 +229,4 @@ def delete_question(id, questionId):
         return jsonify({"error": "Question not found or no permission to delete"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
