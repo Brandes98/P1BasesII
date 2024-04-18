@@ -19,7 +19,7 @@ CREATE TABLE Usuarios (
   Correo VARCHAR(200) NOT NULL UNIQUE, 
   Contrasenna VARCHAR(200) NOT NULL, 
   FechaCreacion TIMESTAMP NOT NULL,     -- Fecha de creacion del usuario
-  FechaNacimiento DATE NOT NULL, 
+  FechaNacimiento TIMESTAMP NOT NULL, 
   Genero VARCHAR(1) NOT NULL,          -- M, F u O
   idPais VARCHAR(3) NOT NULL,    -- Codigo de pais
 
