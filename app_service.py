@@ -27,7 +27,7 @@ class AppService:
     def insert_user(self, user_data):
         return self.database.insert_user(user_data)
 
-    def login_user(self, user_data):
+    def login(self, user_data):
         return self.database.login_user(user_data)
 
     # Usuarios

@@ -105,9 +105,18 @@ def register_user():
     fechaNacimiento = user_data.get("FechaNacimiento")
     genero = user_data.get("Genero")
     idPais = user_data.get("idPais")
-    
+    data = {
+        "Nombre": nombre,
+        "idRol": idRol,
+        "Correo": correo,
+        "Contrasenna": contrasena,
+        "FechaCreacion": fechaCreacion,
+        "FechaNacimiento": fechaNacimiento,
+        "Genero": genero,
+        "idPais": idPais
+    }
     try:
-        appService.insert_user(nombre, idRol, correo, contrasena, fechaCreacion, fechaNacimiento, genero, idPais)
+        appService.insert_user(data)
         return "Usuario agregado"
     except Exception as e:
         return str(e), 400
