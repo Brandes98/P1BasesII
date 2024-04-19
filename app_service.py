@@ -34,6 +34,15 @@ class AppService:
     def get_users(self):
         return self.database.get_users()
     
+    def get_user(self, id):
+        return self.database.get_user(id)
+    
+    def update_user(self, id, data):
+        return self.database.update_user(id, data)
+    
+    def delete_user(self, id, data):
+        return self.database.delete_user(id, data)
+    
     # Encuestas
     def insert_survey(self, data):
         return self.database.insert_survey(data)

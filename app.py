@@ -80,7 +80,39 @@ def login_user():
 @app.route("/users", methods=["GET"])
 def get_users():
     users = appService.get_users()
-    return jsonify(users)
+    return (users)
+
+@app.route("/users/<int:id>", methods=["GET"])
+def get_user(id):
+    try:
+        user = AppService.get_user(id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404  # Ensuring a 404 is returned if no user is found
+        return jsonify(user), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  # Ensure any exceptions are caught and return a 500
+
+@app.route("/users/<int:id>", methods=["PUT"])
+def update_user(id):
+    data = request.get_json()
+    try:
+        data = appService.update_user(id, data)
+        if data is None:
+            return jsonify({"error": "User not found"}), 404
+        return data
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/users/<int:id>", methods=["DELETE"])
+def delete_user(id):
+    try:
+        data = request.get_json()
+        flag = appService.delete_user(id, data)
+        if flag:
+            return "Usuario eliminado", 200
+        return jsonify({"error": "User not found or no permission to delete"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Encuestas
 @app.route("/surveys", methods=["POST"])
@@ -229,4 +261,3 @@ def delete_question(id, questionId):
         return jsonify({"error": "Question not found or no permission to delete"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    

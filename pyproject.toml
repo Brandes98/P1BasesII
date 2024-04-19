@@ -15,6 +15,7 @@ psycopg2 = "^2.9.9"
 pymongo = "^4.6.3"
 redis = "^5.0.3"
 faker = "^24.9.0"
+pytest = "^8.1.1"
 
 
 [build-system]
