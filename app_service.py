@@ -74,3 +74,27 @@ class AppService:
     
     def delete_question(self, id, questionId, data):
         return self.database.delete_question(id, questionId, data)
+
+    def post_response(self, id, data):
+        return self.database.post_response(id, data)
+    
+    def get_responses(self, id):
+        return self.database.get_responses(id)
+    
+    def post_encuestado(self, data):
+        return self.database.post_encuestado(data)
+    
+    def get_encuestados(self, data):
+        return self.database.get_encuestados(data)
+    
+    def get_encuestado(self,data, id):
+        return self.database.get_encuestado(data, id)
+    
+    def actualizar_encuestado(self, id, data):
+        return self.database.actualizar_encuestado(id, data)
+    
+    def eliminar_encuestado(self, id):
+        return self.database.eliminar_encuestado(id)
+    
+    def get_analytics(self, id):
+        return self.database.get_analytics(id)

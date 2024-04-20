@@ -533,7 +533,8 @@ class Database:
         self.redis_client.delete(cache_key)
         self.redis_client.setex(cache_key, 3600, json.dumps(updated_questions)) 
 
-        return updated_questions  
+        return updated_questions 
+
     #verificado
     def post_response(self, id, data):
         token = data.pop('Token', None)
@@ -557,6 +558,7 @@ class Database:
 
             return data
         return None
+    
     def fetch_response_summary(self, survey_id):
     # Count responses for the survey
         response_count = self.respuestas.count_documents({"NumeroEncuesta": survey_id})
@@ -577,6 +579,7 @@ class Database:
             "latest_response": latest
         }
         return summary
+    
 #verificado
     def get_responses(self, id):
         cache_key = f"survey_responses:{id}"
@@ -632,15 +635,11 @@ class Database:
 
         finally:
             cursor.close()
-
-
     
     def datetime_serializer(self,obj):
             """Custom JSON serializer for datetime objects."""
             if isinstance(obj, datetime):
                 return obj.isoformat()  # Convert datetime to ISO 8601 string.
-      
-    
 
     def get_encuestados(self,data): # requiere token
         token = data.pop('Token', None)
@@ -652,6 +651,7 @@ class Database:
             cursor.close()
             return respondents
         return None
+    
     def get_encuestado(self,data, id):
         token = data.pop('Token', None)
         idAutor = data.get('IdAutor')
@@ -662,6 +662,7 @@ class Database:
             cursor.close()
             return respondent
         return None
+    
     def actualizar_encuestado(self, id, data):
         token = data.pop('Token', data)
         idAutor = data.get('IdAutor')
@@ -694,9 +695,6 @@ class Database:
 
         return True
         
-
-
-            
     def eliminar_encuestado(self, id):
         token = request.headers.get("Token", None)
         if not self.verify_token_active(token):
@@ -723,8 +721,6 @@ class Database:
             self.conn.rollback()
             print(f"Error deleting respondent: {e}")
             return False
-
-
 
 def get_analytics(self, id):
     cache_key = f"survey_analytics:{id}"

@@ -58,11 +58,6 @@ def cache_cleaner_questions(id):
 def home():
     return "App Works!!!"
 
-@app.route("/test", methods=["GET"])
-def test():
-    data = request.get_json()
-    return jsonify(appService.test(data))
-
 # Autenticación y Autorización
 # Autenticación y Autorización
 # ruta para registrar un usuario y que coloque sus datos en una pantalla
@@ -128,20 +123,34 @@ def webLogin():
     </form>
     """
 
-# Autenticación y Autorización
-@app.route("/auth/login", methods=["POST"])
+# ruta para logearse
+# en el boton input llama la ruta /auth/login
+# en el metodo POST se llama a la funcion login
+@app.route("/login", methods=["POST"])
 def login():
     try:
-        user_data = request.form.to_dict()
+        
+        user_data = request.get_json()
+
+       
+        if not user_data:
+            user_data = request.form.to_dict()
+
+        correo = user_data.get("Correo")
+        contrasenna = user_data.get("Contrasenna")
+
+        if not correo or not contrasenna:
+            return jsonify({"error": "Correo and Contrasenna are required fields"}), 400
+
         user = appService.login(user_data)
+        
         if user:
-            return jsonify(user)
+            return jsonify(user), 200
         else:
-            # This should be triggered when login fails due to incorrect credentials or user not found
-            return jsonify({"error": "User not found or no permission to delete"}), 401
+            return jsonify({"error": "Invalid credentials"}), 401
+
     except Exception as e:
-        # This should only be triggered by unexpected errors, not by incorrect login attempts
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 400
 
 # Autenticación y Autorización
 @app.route("/auth/register", methods=["POST"])
@@ -345,5 +354,92 @@ def delete_question(id, questionId):
             cache_cleaner_questions(id)
             return "Pregunta eliminada\n" + str(data_db), 200
         return jsonify({"error": "Question not found or no permission to delete"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Respuestas de encuestas
+@app.route("/surveys/<int:id>/responses", methods=["POST"])
+def post_response(id):
+    try:
+        data = request.get_json()
+        result = appService.post_response(id, data)
+        if result:
+            return str(data), 201
+        else:
+            return jsonify({"error": "Failed to insert response"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/surveys/<int:id>/responses", methods=["GET"])
+def get_responses(id):
+    try:
+        responses = appService.get_responses(id)
+        return str(responses)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+#respondents
+@app.route("/respondents", methods=["POST"])
+def post_encuestado():
+    try:
+        data = request.get_json()
+        result = appService.post_encuestado(data)
+        if result:
+            return str(data), 201
+        else:
+            return jsonify({"error": "Failed to insert response"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/respondents", methods=["GET"])
+def get_encuestados():
+    try:
+        data = request.get_json()
+        respondents = appService.get_encuestados(data)
+        if respondents:
+            return str(respondents)
+        else:
+            return jsonify({"error": "Failed to get respondents"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/respondents/<int:id>", methods=["GET"])
+def get_encuestado(id):
+    try:
+        data = request.get_json()
+        respondents = appService.get_encuestado(data, id)
+        if respondents:
+            return str(respondents)
+        else:
+            return jsonify({"error": "Failed to get respondents"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/respondents/<int:id>", methods=["PUT"])
+def actualizar_encuestado(id):
+    try:
+        data = request.get_json()
+        respondents = appService.actualizar_encuestado(id,data)
+        if respondents:
+            return str(respondents)
+        else:
+            return jsonify({"error": "Failed to get respondents"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/respondents/<int:id>", methods=["DELETE"])
+def eliminar_encuestado(id):
+    try:
+        respondent = appService.eliminar_encuestado(id)
+        return str(respondent)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+#analytics
+@app.route("/surveys/<int:id>/analysis", methods=["GET"])
+def get_analytics(id):
+    try:
+        analysis = appService.get_analytics(id)
+        return str(analysis)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
