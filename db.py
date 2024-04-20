@@ -188,14 +188,6 @@ class Database:
         return False
 
     # Autenticación y Autorización
-    def insert_user(self, user_data):
-        cursor = self.conn.cursor()
-        cursor.execute(
-            f"CALL INSERTAR_USUARIO('{user_data['Nombre']}', '{user_data['idRol']}', '{user_data['Correo']}', '{user_data['Contrasenna']}', '{user_data['FechaCreacion']}', '{user_data['FechaNacimiento']}', '{user_data['Genero']}', '{user_data['idPais']}');"
-        )   
-        self.conn.commit()
-        cursor.close()
-
     def login_user(self, user_data):
         cursor = self.conn.cursor()
         token = None
@@ -208,6 +200,18 @@ class Database:
         token = cursor.fetchone()[0]
         cursor.close()
         return token 
+    
+    def insert_user(self, nombre, idRol, correo, contrasena, fechaCreacion, fechaNacimiento, genero, idPais):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("CALL insertar_usuario(%s, %s, %s, %s, %s, %s, %s, %s)", (
+                nombre, idRol, correo, contrasena, fechaCreacion, fechaNacimiento, genero, idPais))
+            self.conn.commit()
+        except Exception as e:
+            self.conn.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     # Usuarios
     def get_users(self):
@@ -279,6 +283,46 @@ class Database:
 
         return jsonify(user), 200
 
+    def update_user(self, id, data):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+                SELECT U.id FROM Usuarios AS U WHERE U.id = %s;""", (id,))
+        user = cursor.fetchone()
+        cursor.execute("""
+                UPDATE Usuarios SET 
+                Nombre = %s, 
+                Correo = %s, 
+                Contrasenna = %s, 
+                FechaNacimiento = %s, 
+                Genero = %s, 
+                idPais = %s 
+                WHERE id = %s;
+            """, (data['Nombre'], data['Correo'], data['Contrasenna'], data['FechaNacimiento'], data['Genero'], data['idPais'], id))
+        self.conn.commit()
+        cursor.close()
+
+        cache_key = f"user:{id}"
+        self.redis_client.delete(cache_key)
+        if user:
+            return jsonify({"status": "success", "message": "Usuario actualizado correctamente"}), 200
+        return jsonify({"status": "error", "message": "Usuario no encontrado"}), 404
+    
+    def delete_user(self, id, data):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+                SELECT U.id FROM Usuarios AS U WHERE U.id = %s;""", (id,))
+        user = cursor.fetchone()
+        cursor.execute("""
+                DELETE FROM Usuarios WHERE id = %s;
+            """, (id,))
+        self.conn.commit()
+        cursor.close()
+
+        cache_key = f"user:{id}"
+        self.redis_client.delete(cache_key)
+        if user:
+            return jsonify({"status": "success", "message": "Usuario eliminado correctamente"}), 200
+        return jsonify({"status": "error", "message": "Usuario no encontrado"}), 404
     
     # Encuestas
     def login(self, user_data):

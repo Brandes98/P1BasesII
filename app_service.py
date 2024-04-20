@@ -24,11 +24,11 @@ class AppService:
 
     # Métodos
     # Autenticación y Autorización
+    def login(self, user_data):
+        return self.database.login_user(user_data)
+
     def insert_user(self, user_data):
         return self.database.insert_user(user_data)
-
-    def login_user(self, user_data):
-        return self.database.login_user(user_data)
 
     # Usuarios
     def get_users(self):
