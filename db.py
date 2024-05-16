@@ -281,7 +281,7 @@ class Database:
         user[4] = user[4].strftime("%Y-%m-%dT%H:%M:%S") if user[4] else None
         user[5] = user[5].strftime("%Y-%m-%dT%H:%M:%S") if user[5] else None
 
-        return jsonify(user), 200
+        return user
 
     def update_user(self, id, data):
         cursor = self.conn.cursor()

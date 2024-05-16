@@ -1,5 +1,3 @@
-# P1BasesII
-
 SISTEMA DE ENCUESTAS - PROYECTO DE BASES II
 ------------------------------------------------------------------
 En el siguiente proyecto se logrará visualizar un sistema donde le
@@ -63,3 +61,17 @@ PREÁMBULO
 	3.3 Poco después de presionar el botón, podrá observar la ejecución de las 
 	    pruebas y verá que la evaluación realiza por el Pytest es del 100% de 
 	    aceptación.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
